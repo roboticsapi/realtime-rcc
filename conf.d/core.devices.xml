@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Devices xmlns="http://schema.roboticsapi.org/devices.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://schema.roboticsapi.org/devices.xsd devices.xsd ">
+	<Device type="rcc" name="rcc">
+		<Parameter name="needestop">false</Parameter>
+		<Parameter name="debugginglevel">1</Parameter>
+		<Parameter name="netunloading">true</Parameter>
+		<Parameter name="debuggingtime">2.0</Parameter>
+		<Parameter name="webport">8080</Parameter>
+		<Parameter name="dioport">8081</Parameter>
+	</Device>
+</Devices>

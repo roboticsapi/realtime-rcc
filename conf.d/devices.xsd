@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://schema.roboticsapi.org/devices.xsd" elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schema.roboticsapi.org/devices.xsd">
+
+    <xsd:complexType name="Device">
+    	<xsd:sequence>
+    		<xsd:element name="Parameter" type="Parameter" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+    	</xsd:sequence>
+    	<xsd:attribute name="type" type="xsd:string" use="required"></xsd:attribute>
+    	<xsd:attribute name="name" type="xsd:string" use="required"></xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="Parameter">
+    	<xsd:simpleContent>
+    		<xsd:extension base="xsd:string">
+    			<xsd:attribute name="name" type="xsd:string"
+    				use="required">
+    			</xsd:attribute>
+    		</xsd:extension>
+    	</xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:element name="Devices" type="Devices"></xsd:element>
+    
+    <xsd:complexType name="Devices">
+    	<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+    		<xsd:element name="Device" type="Device"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,20 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. 
+ *
+ * Copyright 2010-2017 ISSE, University of Augsburg 
+ */
+
+#ifndef SVNVERSION_H_
+#define SVNVERSION_H_
+
+#define RCC_VERSION_MAJOR "${RCC_VERSION_MAJOR}"
+#define RCC_VERSION_MINOR "${RCC_VERSION_MINOR}"
+#define RCC_VERSION_PATCH "${RCC_VERSION_PATCH}"
+#define SVN_REVISION "${Project_WC_REVISION}"
+#define SVN_LAST_CHANGE "${Project_WC_LAST_CHANGED_DATE}"
+#define SVN_LAST_AUTHOR "${Project_WC_LAST_CHANGED_AUTHOR}"
+#define SVN_URL "${Project_WC_URL}"
+#define CXXCOMPILER "${CMAKE_CXX_COMPILER}"
+
+#endif /* SVNVERSION_H_ */

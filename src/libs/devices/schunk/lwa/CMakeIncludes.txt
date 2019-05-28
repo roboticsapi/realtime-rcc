@@ -1,0 +1,12 @@
+# Schunk LWA
+set(BUILD_SCHUNK_LWA_CAN OFF CACHE BOOL "Build SchunkLWA over CANopen components")
+set(BUILD_SCHUNK_LWA_SIM ON CACHE BOOL "Build SchunkLWA simulation components")
+
+if(BUILD_SCHUNK_LWA_CAN OR BUILD_SCHUNK_LWA_SIM)
+	set(BUILD_ROBOTARM ON)
+	set(BUILD_ARMKINEMATICS ON)
+endif()
+
+if(BUILD_SCHUNK_LWA_CAN)
+	set(BUILD_CANOPEN ON)
+endif()	

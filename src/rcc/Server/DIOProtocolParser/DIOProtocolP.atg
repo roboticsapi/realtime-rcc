@@ -1,0 +1,76 @@
+#include "DIOProtocolP.hpp"
+
+COMPILER DIOProtocolP
+
+public: 
+std::unique_ptr<DIOCommand> diocommand;
+
+CHARACTERS
+  nondigit =  'A'..'Z' + 'a'..'z' + "_". 
+  character = nondigit + "0123456789".
+  regularStringChar = ANY - '"' - '\\'.
+  digit = "0123456789".
+
+TOKENS
+  string = '"' { regularStringChar | "\\\\" | "\\\"" } '"'.
+  identifier = nondigit { character }.
+  integer = digit { digit }.
+  float = { digit } "." digit { digit }.
+
+PRODUCTIONS
+
+DIOStringP <. std::unique_ptr<DIOLiteral>& lit .>
+	= string												(. lit.reset(new DIOString(t->val)); .)
+	.
+	
+DIOIntegerP <. std::unique_ptr<DIOLiteral>& lit .>
+	= integer												(. lit.reset(new DIOInteger(t->val)); .)
+	.
+	
+DIOFloatP <. std::unique_ptr<DIOLiteral>& lit .>
+	= float													(. lit.reset(new DIOFloat(t->val)); .)
+	.
+
+DIOLiteralP <. std::unique_ptr<DIOLiteral>& lit .>
+	= DIOStringP <lit>
+	| DIOIntegerP <lit>
+	| DIOFloatP <lit>
+	.
+
+DIOMapP <. std::unique_ptr<DIOParameterMap>& pmap .>		(. std::unique_ptr<DIOParameter> param; std::string key; .)
+	= (identifier											(. key = DIOString::tostr(t->val); .)
+	| string												(. key = DIOString::unescape(DIOString::tostr(t->val)); .)
+	)
+	":" DIOParameterP <param>								(. pmap->addParameter(key, std::move(param)); .)
+	.
+
+DIOParameterP <. std::unique_ptr<DIOParameter>& param .>	(. std::unique_ptr<DIOLiteral> lit;  .)
+	= (DIOLiteralP <lit>									(. param = std::move(lit); .)
+	| "[" 													(. std::unique_ptr<DIOParameterList> paramlist(new DIOParameterList()); std::unique_ptr<DIOParameter> nparam; .)
+		[ DIOParameterP <nparam>							(. paramlist->addParameter(std::move(nparam)); .)
+		{ "," DIOParameterP <nparam> 						(. paramlist->addParameter(std::move(nparam)); .)
+		} ] "]"												(. param = std::move(paramlist); .) 
+	| "{"													(. std::unique_ptr<DIOParameterMap> pmap(new DIOParameterMap()); .) 
+		[ DIOMapP <pmap>
+		{ "," DIOMapP <pmap>
+	} ] "}"													(. param.reset(pmap.release()); .)
+	).
+
+DIOParametersP <. std::unique_ptr<DIOCommand>& dioc .>		(. std::unique_ptr<DIOParameter> p; .)
+	= [ DIOParameterP <p> 									(. dioc->parameters.addParameter(std::move(p)); .)
+	{"," DIOParameterP <p>									(. dioc->parameters.addParameter(std::move(p)); .)
+	}]
+	.
+
+DIOCommandP <. std::unique_ptr<DIOCommand>& dioc .>			(. dioc.reset(new DIOCommand()); .)
+	= identifier											(. dioc->tag = DIOString::tostr(t->val); .)
+	"="
+	identifier												(. dioc->command = DIOString::tostr(t->val); .)
+	"("
+	DIOParametersP <dioc>
+	")"
+	.
+
+DIOProtocolP = DIOCommandP <diocommand>.
+
+END DIOProtocolP.

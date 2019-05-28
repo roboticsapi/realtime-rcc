@@ -1,0 +1,64 @@
+#include "DIONet.hpp"
+
+COMPILER RPINet
+
+public: 
+AstFragment finalfrag;
+
+CHARACTERS
+  character = 'A'..'Z' + 'a'..'z' + "0123456789:_".
+  regularStringChar = ANY - "'" - '\\'.
+  digit = "0123456789".
+
+TOKENS
+  string = "'" { regularStringChar | "\\\\" | "\\'" } "'".
+  identifier = character { character }.
+  debugtime = "[" digit { digit } [ "." digit {digit} ] "]".
+
+PRODUCTIONS
+
+  Debugtime <double& ret>
+  = debugtime											(. ret = atof(unescape_dionet(tostr(t->val)).c_str()); .).
+
+  Identifier <std::string& ret> 
+  = identifier											(. ret = tostr(t->val); .) .
+
+  String <std::string& ret>
+  = string												(. ret = unescape_dionet(tostr(t->val)); .).
+
+  Primitive <AstPrimitive& ret> 						(. std::string type; AstFragment fragment; .)
+  = Identifier <type> (									(. ret = AstPrimitive::newDefinition(type); .)
+  	  "(" [ PParam <ret> {"," PParam <ret> } ] ")" 
+  	| /* empty */										(. ret = AstPrimitive::newReference(type); .)
+    )
+  | Fragment <fragment>									(. ret = AstPrimitive::newFragment(fragment); .)
+    "(" [ PParam <ret> {"," PParam <ret> } ] ")".
+
+  Fragment <AstFragment& ret>							(. ret = AstFragment::newFragment(); .) 
+  = "{" [ FParam <ret> {"," FParam<ret> } ] "}".
+
+  PParam <AstPrimitive& primitive>						(. double debug = 0; std::string name; AstPValue pvalue; .) 
+  = Identifier <name> [ Debugtime <debug> ] 
+    "=" PValue <pvalue, debug>							(. if(pvalue.isString()) primitive.putParameter(name, pvalue.str); else { AstPortRefPtr aprp(new AstPortRef(pvalue.portRef)); primitive.putInPort(name, aprp); } .).
+  
+  PValue <AstPValue& ret, double debug> 				(. AstPortRef ref; std::string value; .)
+  = String <value>										(. ret = AstPValue::newString(value); .) 
+  | PortRef <ref, debug>								(. ret = AstPValue::newPortRef(ref); .).
+
+  PortRef <AstPortRef& ret, double debug> 				(. AstPrimitive primitive; std::string name; .)
+  = Primitive <primitive> "." Identifier <name>			(. ret = AstPortRef::newPortRef(primitive, name, debug); .).
+
+  FParam <AstFragment& fragment> 						(. double debug = 0; std::string name; AstFValue fvalue; .)
+  = Identifier <name> [ Debugtime <debug> ] 
+    "=" FValue <fvalue, debug>							(. if(fvalue.isPrim()) { AstPrimitivePtr app(new AstPrimitive(fvalue.prim)); fragment.putPrimitive(name, app); } else { AstPortRefPtr aprp(new AstPortRef(fvalue.portRef)); fragment.putOutPort(name, aprp); } .).
+
+  FValue <AstFValue& ret, double debug> 				(. AstPrimitive primitive; std::string portname; .)
+  = Primitive <primitive>
+    ( "." Identifier <portname>							(. ret = AstFValue::newPortRef(AstPortRef::newPortRef(primitive, portname, debug)); .)
+    | /* empty */										(. ret = AstFValue::newPrimitive(primitive); .)
+    ).
+
+  RPINet = Fragment <finalfrag>	
+	.
+
+END RPINet.

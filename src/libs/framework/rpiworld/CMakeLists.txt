@@ -1,0 +1,6 @@
+if (BUILD_RPIWORLD)
+add_library(rpiworld SHARED rpiworld)
+target_link_libraries(rpiworld ${RealtimeRCC_module_libraries})
+target_link_libraries(rpiworld RCCCore)
+install(TARGETS rpiworld LIBRARY DESTINATION ${INSTALL_PATH} COMPONENT core RUNTIME DESTINATION ${INSTALL_PATH} COMPONENT core)
+endif (BUILD_RPIWORLD)

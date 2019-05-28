@@ -1,0 +1,3 @@
+include(src/libs/devices/beckhoff/CMakeIncludes.txt OPTIONAL)
+include(src/libs/devices/kuka/CMakeIncludes.txt OPTIONAL)
+include(src/libs/devices/schunk/CMakeIncludes.txt OPTIONAL)

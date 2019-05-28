@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Extensions xmlns="http://schema.roboticsapi.org/extensions.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://schema.roboticsapi.org/extensions.xsd extensions.xsd ">
+	<Extension file="rpicore" />
+	<Extension file="rpiworld" />
+</Extensions>
