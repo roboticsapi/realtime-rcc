@@ -1,0 +1,49 @@
+#include "SchedulingConditionP.hpp"
+
+COMPILER SchedCond
+
+public: 
+	std::unique_ptr<CDisjunction> cond;
+
+CHARACTERS
+  character = 'A'..'Z' + 'a'..'z' + "0123456789:_".
+
+TOKENS
+  identifier = character { character }.
+
+PRODUCTIONS
+
+Identifier <std::string& ret> 
+  = identifier												(. ret = tostr(t->val); .) .
+
+BoolExpr <.std::unique_ptr<CBoolExpr>& boolex.>  			(. std::string net, port; 
+																std::unique_ptr<CDisjunction> ndis(new CDisjunction()); .)
+	= ( 
+	Identifier <net> "." Identifier <port>					(. boolex->setNet(net); boolex->setPort(port); .)
+	| "t"													(. boolex->setTrue(); .)							
+	| "(" Disjunction <ndis> ")"							(. boolex->add(std::move(ndis)); .)
+	).
+
+Negation <.std::unique_ptr<CNegation>& conp.> 				(. std::unique_ptr<CBoolExpr> be(new CBoolExpr()); .)
+	= (
+	"!" BoolExpr <be>										(. conp->add(std::move(be)); conp->negate(); .)
+	| BoolExpr <be>											(. conp->add(std::move(be)); .)
+	).
+
+Conjunction <.std::unique_ptr<CConjunction>& disp.>			(. std::unique_ptr<CNegation> nconp(new CNegation());
+ 																std::unique_ptr<CNegation> ndisp(new CNegation()); .)
+	= Negation <nconp>										(. disp->add(std::move(nconp)); .)
+	{ "&" Negation <ndisp>									(. disp->add(std::move(ndisp)); ndisp.reset(new CNegation()); .)
+	}.
+
+Disjunction <.std::unique_ptr<CDisjunction>& dis.>  		(. std::unique_ptr<CConjunction> ndisp(new CConjunction());
+																std::unique_ptr<CConjunction> ndis(new CConjunction()); .)
+	= Conjunction <ndisp>									(. dis->add(std::move(ndisp)); .)
+	{ "|" Conjunction <ndis> 								(. dis->add(std::move(ndis)); ndis.reset(new CConjunction()); .)
+	}.
+	
+SchedCond													(. cond.reset(new CDisjunction()); .) 
+	= Disjunction <cond>.								
+
+END SchedCond.
+

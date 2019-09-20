@@ -1,0 +1,129 @@
+&ACCESS RVP
+&REL 55
+&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe
+&PARAM EDITMASK = *
+DEF fri2( )
+  decl fristate Ret
+  DECL INT rcc_current_data, rcc_last_data
+  
+  
+  ;FOLD INI
+  ;FOLD BASISTECH INI
+  GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )
+  INTERRUPT ON 3 
+  BAS (#INITMOV,0 )
+  ;ENDFOLD (BASISTECH INI)
+  ;FOLD USER INI
+  ;Make your modifications here
+  
+  ;ENDFOLD (USER INI)
+  ;ENDFOLD (INI)
+  
+  defaultvalues()
+  
+  ; remove synchronization flag in case program was aborted
+  $FRI_TO_BOOL[16] = FALSE
+  
+  PTP $POS_ACT
+  $TOOL = TOOL_DATA[1]
+  $LOAD.M = LOAD_DATA[1].M
+  $LOAD.CM = LOAD_DATA[1].CM
+  $LOAD.J = LOAD_DATA[1].J
+  
+  
+  ret = frisetup("192.168.100.1",49938,0)
+  ret = friopen(12)
+  
+  WAIT SEC 2
+  
+  ret = fristart(1.0)
+  
+  LOOP
+    
+    ; Wait for synchronization flag
+    WAIT FOR $FRI_FRM_BOOL[16]
+    
+    ; drive to current position - while FRI is still running
+    PTP $POS_ACT
+    ret = fristop()
+    
+    ; acknowledge synchronization
+    $FRI_TO_INT[16] = -1
+    $FRI_TO_BOOL[16] = TRUE
+    
+    rcc_last_data = -1
+    ; do dataexchange with RCC
+    WHILE $FRI_FRM_BOOL[16]
+      rcc_current_data = $FRI_FRM_INT[16]
+      
+      IF rcc_current_data <> rcc_last_data THEN
+        
+        SWITCH rcc_current_data
+        CASE 1
+          $STIFFNESS.STRATEGY = $FRI_FRM_INT[15]
+        CASE 2
+          $TOOL.X = $FRI_FRM_REA[15]
+        CASE 3
+          $TOOL.Y = $FRI_FRM_REA[15]
+        CASE 4
+          $TOOL.Z = $FRI_FRM_REA[15]   
+        CASE 5
+          $TOOL.A = $FRI_FRM_REA[15]        
+        CASE 6
+          $TOOL.B = $FRI_FRM_REA[15]     
+        CASE 7
+          $TOOL.C = $FRI_FRM_REA[15]     
+        CASE 8
+          $LOAD.M = $FRI_FRM_REA[15]
+        CASE 9
+          $LOAD.CM.X = $FRI_FRM_REA[15]
+        CASE 10
+          $LOAD.CM.Y = $FRI_FRM_REA[15]          
+        CASE 11
+          $LOAD.CM.Z = $FRI_FRM_REA[15]          
+        CASE 12
+          $LOAD.CM.A = $FRI_FRM_REA[15]
+        CASE 13
+          $LOAD.CM.B = $FRI_FRM_REA[15]
+        CASE 14
+          $LOAD.CM.C = $FRI_FRM_REA[15]
+        CASE 15
+          $LOAD.J.X = $FRI_FRM_REA[15]
+        CASE 16
+          $LOAD.J.Y = $FRI_FRM_REA[15]
+        CASE 17
+          $LOAD.J.Z = $FRI_FRM_REA[15]
+        ENDSWITCH
+        
+        rcc_last_data = rcc_current_data
+        $FRI_TO_INT[16] = rcc_current_data
+      ELSE
+        WAIT SEC 0.01
+      ENDIF
+    ENDWHILE
+    
+    $STIFFNESS.TOOL = $TOOL
+    $STIFFNESS.COMMIT = TRUE
+    
+    ret = fristart(1.0)
+    
+    $FRI_TO_BOOL[16] = FALSE
+    
+  ENDLOOP
+  
+  HALT
+  ret = fristop()
+  ret = friclose()
+END
+
+def defaultvalues()
+  $STIFFNESS.CPSTIFFNESS = {X 2000, Y 2000, Z 2000, A 200, B 200, C 200}
+  $STIFFNESS.CPDAMPING = {X 0.7, Y 0.7, Z 0.7, A 0.7, B 0.7, C 0.7}
+  $STIFFNESS.AXISSTIFFNESS = {A1 1000, A2 1000, A3 1000, A4 1000, A5 1000, A6 1000, E1 1000}
+  $STIFFNESS.AXISDAMPING = {A1 0.7, A2 0.7, A3 0.7, A4 0.7, A5 0.7, A6 0.7, E1 0.7}
+  $STIFFNESS.CPMAXDELTA = {X 100, Y 100, Z 100, A 20000, B 20000, C 20000}
+  $STIFFNESS.MAXFORCE = {X 150,Y 150, Z 150, A 150, B 150, C 150}
+  $STIFFNESS.AXISMAXDELTA = {A1 360, A2 360, A3 360, A4 360, A5 360, A6 360, E1 360}
+  $STIFFNESS.AXISMAXDELTATRQ = {E1 1000, A1 1000, A2 1000, A3 1000, A4 1000, A5 1000, A6 1000}
+  $STIFFNESS.COMMIT = TRUE
+end

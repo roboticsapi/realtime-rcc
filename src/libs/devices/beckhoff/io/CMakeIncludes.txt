@@ -1,0 +1,6 @@
+# Beckhoff IO (EtherCAT)
+set(BUILD_BECKHOFF_IO OFF CACHE BOOL "Build Beckhoff I/O components (for EtherCAT bus)")
+if(BUILD_BECKHOFF_IO)
+	set(BUILD_IO ON)
+	set(BUILD_ETHERCAT ON)
+endif()

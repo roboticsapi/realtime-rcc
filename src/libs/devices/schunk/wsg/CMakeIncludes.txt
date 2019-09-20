@@ -1,0 +1,3 @@
+# Schunk WSG
+set(BUILD_SCHUNKWSG_CAN OFF CACHE BOOL "Build SchunkWsg over CAN components")
+set(BUILD_SCHUNKWSG_SIM ON CACHE BOOL "Build SchunkWsg simulation components")

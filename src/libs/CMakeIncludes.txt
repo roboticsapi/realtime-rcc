@@ -1,0 +1,2 @@
+include(src/libs/framework/CMakeIncludes.txt OPTIONAL)
+include(src/libs/devices/CMakeIncludes.txt OPTIONAL)

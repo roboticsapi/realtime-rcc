@@ -1,0 +1,4 @@
+include(src/libs/devices/kuka/kr/CMakeIncludes.txt OPTIONAL)
+include(src/libs/devices/kuka/lwr/CMakeIncludes.txt OPTIONAL)
+include(src/libs/devices/kuka/youbot/CMakeIncludes.txt OPTIONAL)
+

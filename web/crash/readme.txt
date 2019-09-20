@@ -1,0 +1,1 @@
+This folder contains crash dumps created while running the robot control core.

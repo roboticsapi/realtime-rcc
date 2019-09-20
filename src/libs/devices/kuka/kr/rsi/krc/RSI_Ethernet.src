@@ -1,0 +1,89 @@
+&ACCESS RVP
+&REL 9
+&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe
+&PARAM EDITMASK = *
+DEF RSI_Ethernet( )
+; =============================================
+; 
+; RealtimeRCC RSI Client application
+; Communicates with the RCC to integrate KUKA
+; KR robots in the Robotics API Developer Platform
+;
+; Copyright ISSE 2014
+; Author: Michael Vistein
+;
+; Based on KUKA RSI example
+;
+; =============================================
+
+; Declaration of KRL variables
+DECL INT ret	; Return value for RSI commands
+DECL INT CONTID	; ContainerID
+
+;FOLD INI
+  ;FOLD BASISTECH INI
+    GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )
+    INTERRUPT ON 3 
+    BAS (#INITMOV,0 )
+  ;ENDFOLD (BASISTECH INI)
+  ;FOLD USER INI
+    ;Make your modifications here
+
+  ;ENDFOLD (USER INI)
+;ENDFOLD (INI)
+
+; Move to current position to reach SAK
+PTP $AXIS_ACT
+
+; Create RSI Context 
+ret = RSI_CREATE("RCC.rsi",CONTID,TRUE)
+IF (ret <> RSIOK) THEN
+  HALT
+ENDIF
+
+; Start RSI execution
+ret = RSI_ON(#ABSOLUTE)
+IF (ret <> RSIOK) THEN
+  HALT
+ENDIF
+
+WHILE(TRUE)
+
+; Set status to 0 - initialization phase
+$SEN_PINT[1]=0
+; Start RSI communication, robot will not be moved
+RSI_MOVECORR()
+; block advance interpretation
+WAIT SEC 0
+
+; configure TOOL data
+$TOOL.X = $SEN_PREA[1]
+$TOOL.Y = $SEN_PREA[2]
+$TOOL.Z = $SEN_PREA[3]
+$TOOL.A = $SEN_PREA[4]
+$TOOL.B = $SEN_PREA[5]
+$TOOL.C = $SEN_PREA[6]
+
+; configure load data
+$LOAD.CM = $TOOL
+$LOAD.M = $SEN_PREA[7]
+
+; Move to current position to apply new tool/load data
+; Needed especially for absolute positioning robots
+PTP $POS_ACT
+
+; activate RSI movement
+$SEN_PINT[1]=1
+RSI_MOVECORR()
+; block advance interpretation
+WAIT SEC 0
+
+ENDWHILE
+
+; Turn off RSI - will never be reached
+ret = RSI_OFF()
+IF (ret <> RSIOK) THEN
+  HALT
+ENDIF
+
+END

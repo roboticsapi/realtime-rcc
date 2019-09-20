@@ -1,0 +1,2 @@
+include(src/libs/devices/schunk/lwa/CMakeIncludes.txt OPTIONAL)
+include(src/libs/devices/schunk/wsg/CMakeIncludes.txt OPTIONAL)

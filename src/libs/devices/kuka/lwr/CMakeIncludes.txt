@@ -1,0 +1,12 @@
+# LWR
+set(BUILD_KUKA_LWR_FRI OFF CACHE BOOL "Build KUKA LWR over FRI components")
+set(BUILD_KUKA_LWR_SIM ON CACHE BOOL "Build KUKA LWR simulation components")
+if(BUILD_KUKA_LWR_FRI OR BUILD_KUKA_LWR_SIM)
+	set(BUILD_IO ON)
+	set(BUILD_ROBOTARM ON)
+	set(BUILD_ARMKINEMATICS ON)
+endif()
+
+#IIWA
+set(BUILD_KUKA_IIWA_FRI OFF CACHE BOOL "Build KUKA IIWA over FRI components")
+set(BUILD_KUKA_IIWA_SIM ON CACHE BOOL "Build KUKA IIWA simulation components")

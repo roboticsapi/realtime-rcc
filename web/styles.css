@@ -1,0 +1,11 @@
+body {font-family: Arial, Helvetica; padding: 0; margin: 0 5px 5px 5px; }
+h1 {margin: 0 -5px 5px -5px; padding: 2px; font-size: 130%; background: #aaf; text-align: center; }
+h3 {margin: 15px 0 0 0; }
+h2 {border: solid #aaf; border-width: 0 0 1px 0; text-align: center; font-size: 120%; }
+th {font-weight: normal; font-style: italic; }
+table {border-collapse: collapse; min-width: 30%; border: solid #aaf 1px; }
+th, td {border: solid #aaf 1px; min-width: 6em; padding: 2px 2px 2px 2px; }
+#navi {text-align: right; }
+a {text-decoration: none; }
+a:hover {text-decoration: underline; }
+dt {font-weight: bold; }

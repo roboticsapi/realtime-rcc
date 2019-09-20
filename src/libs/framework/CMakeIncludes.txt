@@ -1,0 +1,27 @@
+# Core extensions
+set(BUILD_RPICORE ON CACHE BOOL "Build basic RPI modules")
+set(BUILD_RPIWORLD ON CACHE BOOL "Build RPI world modules")
+
+# Communication extensions
+set(BUILD_ETHERCAT OFF CACHE BOOL "Build EtherCAT components")
+set(BUILD_SOCKETCAN OFF CACHE BOOL "Build SocketCan components")
+set(BUILD_RTSOCKETCAN OFF CACHE BOOL "Build RT-SocketCan components")
+set(BUILD_CANOPEN OFF CACHE BOOL "Build CanOpen components")
+
+set(BUILD_ETHERNET_STANDARD OFF CACHE BOOL "Build Ethernet devices (non rtnet)")
+set(CPACK_COMPONENT_ETHERNET.STANDARD_DISPLAY_NAME "Generic ethernet device (non rtnet)")
+set(CPACK_COMPONENT_ETHERNET.STANDARD_GROUP "Communication")
+
+set(BUILD_ETHERNET_RTNET OFF CACHE BOOL "Build Ethernet devices (real-time rtnet)")
+set(CPACK_COMPONENT_ETHERNET.RTNET_DISPLAY_NAME "Generic ethernet device (real-time rtnet)")
+set(CPACK_COMPONENT_ETHERNET.RTNET_GROUP "Communication")
+if(BUILD_ETHERNET_RTNET)
+	set(BUILD_WITH_RTNET ON)
+endif(BUILD_ETHERNET_RTNET)
+
+# Generic interface extensions
+set(BUILD_IO ON CACHE BOOL "Build IO components")
+set(BUILD_ROBOTARM ON CACHE BOOL "Build robot arm components")
+set(BUILD_ROBOTBASE ON CACHE BOOL "Build robot base components")
+set(BUILD_CARTESIANPOSITION ON CACHE BOOL "Build Cartesian position device components")
+set(BUILD_ARMKINEMATICS ON CACHE BOOL "Build robot arm kinematic components")
